@@ -24,7 +24,7 @@ body {
 """
 st.markdown(page_bg, unsafe_allow_html=True)
 
-# ========================= LOGIN ==============================
+# ========================= LOGIN =============================
 st.markdown("## 🔒 Đăng nhập hệ thống")
 
 USER = "user_demo"
@@ -47,7 +47,7 @@ if login_btn:
 if not st.session_state.logged_in:
     st.stop()
 
-# ========================= LOGO ===============================
+# ========================= LOGO ==============================
 st.markdown("### 🌿 Plant Disease Detection System")
 logo_path = "assets/Logo_Marie_Curie.png"
 if os.path.exists(logo_path):
@@ -55,18 +55,18 @@ if os.path.exists(logo_path):
 
 st.markdown("---")
 
-# ========================= GOOGLE DRIVE MODEL DOWNLOAD =========================
-
+# ========================= GOOGLE DRIVE MODEL =================
 MODEL_URL = "https://drive.google.com/uc?export=download&id=1pLZYbUXHnoIEZEHrjg2Q-bj9Q47vOKh1"
 MODEL_PATH = "plant_disease_Cnn.h5"
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_model_from_drive():
-    # Nếu file chưa tồn tại → tải từ Drive
+    # Tải model nếu chưa có
     if not os.path.exists(MODEL_PATH):
         with st.spinner("🔽 Đang tải mô hình từ Google Drive..."):
             r = requests.get(MODEL_URL)
-            open(MODEL_PATH, "wb").write(r.content)
+            with open(MODEL_PATH, "wb") as f:
+                f.write(r.content)
             st.success("✔ Tải mô hình thành công!")
 
     # Load model
@@ -77,8 +77,7 @@ def load_model_from_drive():
 
 model = load_model_from_drive()
 
-# ========================= AUTO CLASS LOADING ======================
-
+# ========================= CLASS LOADING =====================
 num_classes = model.output_shape[-1]
 
 if num_classes == 2:
@@ -88,7 +87,7 @@ else:
 
 st.info(f"Classes loaded: {classes}")
 
-# ========================= IMAGE UPLOAD ============================
+# ========================= IMAGE UPLOAD ======================
 st.subheader("📸 Tải ảnh lá cây để nhận diện bệnh")
 
 uploaded_file = st.file_uploader("Tải ảnh lên (.jpg, .png)", type=["jpg", "jpeg", "png"])
@@ -96,6 +95,8 @@ uploaded_file = st.file_uploader("Tải ảnh lên (.jpg, .png)", type=["jpg", "
 def prepare(img):
     img = img.resize((224, 224))
     img = np.asarray(img) / 255.0
+    if len(img.shape) == 2:  # nếu ảnh grayscale, convert thành 3 channels
+        img = np.stack((img,) * 3, axis=-1)
     return np.expand_dims(img, axis=0)
 
 if uploaded_file:
@@ -106,8 +107,8 @@ if uploaded_file:
         with st.spinner("Đang phân tích hình ảnh..."):
             x = prepare(img)
             pred = model.predict(x)
-            class_id = np.argmax(pred)
-            confidence = np.max(pred)
+            class_id = int(np.argmax(pred))
+            confidence = float(np.max(pred))
 
         st.success(f"🌿 **Kết quả:** {classes[class_id]}")
         st.info(f"Độ tin cậy: {confidence * 100:.2f}%")
