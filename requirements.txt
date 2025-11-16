@@ -1,7 +1,7 @@
 streamlit==1.32.2
 tensorflow>=2.20.0
 numpy
-pillow
+pillow>=10.3.0
 opencv-python
 requests
 setuptools>=68.0.0
