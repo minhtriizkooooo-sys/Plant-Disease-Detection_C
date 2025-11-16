@@ -12,10 +12,10 @@ st.set_page_config(
     layout="centered",
 )
 
-# Custom CSS for cleaner aesthetics, centering logo, and hiding Streamlit style elements
+# Custom CSS for cleaner aesthetics, centering elements, and modern 'Tailwind-like' design
 st.markdown("""
 <style>
-/* 1. Background and Typography (Cleaner look) */
+/* 1. Background and Typography */
 .stApp {
     background-color: #f0fff0; /* Nền xanh lá cây nhạt theo yêu cầu */
     color: #1a1a1a;
@@ -25,6 +25,7 @@ h3, h2, h1 {
     color: #059669; /* Xanh lá cây chuyên nghiệp */
     font-weight: 700;
     text-align: center;
+    white-space: nowrap; /* Đảm bảo tiêu đề không bị xuống dòng */
 }
 /* Login Card styling for visual separation */
 .login-container {
@@ -33,15 +34,15 @@ h3, h2, h1 {
     padding: 30px;
     border-radius: 10px;
     background-color: #ffffff; /* Nền card trắng */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shadow hiện đại hơn */
 }
 /* Input fields style */
 div.stTextInput>div>div>input {
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db; /* Border nhạt hơn */
+    padding: 12px;
 }
-/* 2. Centering Logo/Images */
+/* Centering Logo/Images */
 .stImage {
     text-align: center;
 }
@@ -49,19 +50,21 @@ div.stTextInput>div>div>input {
     display: inline-block;
     border-radius: 8px;
 }
-/* 3. Button Styling */
+/* Button Styling (Modern Look) */
 .stButton>button {
     background-color: #059669;
     color: white;
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    transition: background-color 0.3s;
-    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: background-color 0.3s, transform 0.1s;
+    font-weight: 700;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 15px;
+    border: none;
 }
 .stButton>button:hover {
     background-color: #047857;
+    transform: translateY(-1px); /* Hiệu ứng nhấn nhẹ */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -79,53 +82,46 @@ if "logged_in" not in st.session_state:
 if not st.session_state.logged_in:
     # Start login-container block
     st.markdown("<div class='login-container'>", unsafe_allow_html=True)
-    st.markdown("## 🔒 Đăng nhập hệ thống", unsafe_allow_html=True)
+    st.markdown("<h2>🔒 Đăng nhập hệ thống</h2>", unsafe_allow_html=True)
 
-    # Use columns to place the form and hints side-by-side
     col_form, col_hint = st.columns([2, 1])
 
     with col_form:
-        # User must enter ID/Pass (no default value)
         username_input = st.text_input("User ID", placeholder="Nhập ID", key="username_val")
         password_input = st.text_input("Password", type="password", placeholder="Nhập mật khẩu", key="password_val")
         login_btn = st.button("Đăng nhập")
 
     with col_hint:
-        # Display login hints in the right column
-        st.markdown("##### Gợi ý (Demo)")
-        st.markdown(f"- **ID:** `{USER}`")
-        st.markdown(f"- **Pass:** `{PASS}`")
+        st.markdown("<h5 style='color: #059669;'>Gợi ý (Demo)</h5>", unsafe_allow_html=True)
+        st.markdown(f"**ID:** `{USER}`")
+        st.markdown(f"**Pass:** `{PASS}`")
 
     if login_btn:
         if username_input == USER and password_input == PASS:
             st.session_state.logged_in = True
-            # FIXED: Removed state value assignment to avoid StreamlitAPIException
-            st.rerun() # Rerun to switch to the main page
+            st.rerun() 
         else:
             st.error("Sai tài khoản hoặc mật khẩu!")
 
-    # End login-container block
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
-# If already logged in, the code continues from here
+# ========================= MAIN APP: HEADER & LOGO ======================
 
-# ========================= MAIN APP: LOGO & HEADER ======================
+# Tiêu đề chính (đã fix lỗi xuống dòng)
+st.header("🌿 Plant Disease Detection System")
 
 # Centered Logo Display
-col1, col2, col3 = st.columns([1, 2, 1])
-# Assumes the logo image is in the 'assets' folder
 logo_path = "assets/Logo_Marie_Curie.png" 
-with col2:
-    st.markdown("### 🌿 Plant Disease Detection System", unsafe_allow_html=True)
+col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 'auto', 1])
+with col_logo_2:
     if os.path.exists(logo_path):
         st.image(logo_path, width=180)
     else:
-        st.markdown("*(Logo Placeholder)*")
+        st.markdown("<div style='text-align: center; padding: 10px;'>*(Logo Placeholder)*</div>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ========================= GOOGLE DRIVE MODEL HANDLING =================
-# URL to the model file (usually .h5)
 MODEL_URL = "https://drive.google.com/uc?export=download&id=1pLZYbUXHnoIEZEHrjg2Q-bj9Q47vOKh1"
 MODEL_PATH = "plant_disease_Cnn.h5"
 
@@ -135,6 +131,8 @@ def load_model_from_drive():
     if not os.path.exists(MODEL_PATH):
         try:
             with st.spinner("Đang tải mô hình..."):
+                # Use a small wait time for visual feedback before starting download
+                time.sleep(1) 
                 r = requests.get(MODEL_URL, stream=True)
                 r.raise_for_status() 
                 with open(MODEL_PATH, "wb") as f:
@@ -144,11 +142,9 @@ def load_model_from_drive():
             st.error(f"Lỗi khi tải mô hình: {e}")
             st.stop()
             
-    # Load model
+    # Load model (Fixed: Removed the problematic disable_resource_sanitization call)
     with st.spinner("Đang load mô hình..."):
-        # Disable logger to suppress unnecessary TF/Keras warnings during loading
-        with tf.get_logger().disable_resource_sanitization():
-             model = tf.keras.models.load_model(MODEL_PATH)
+        model = tf.keras.models.load_model(MODEL_PATH)
     return model
 
 # Load the model and cache it
@@ -158,10 +154,8 @@ model = load_model_from_drive()
 num_classes = model.output_shape[-1]
 
 if num_classes == 2:
-    # Define labels for 2-class model (Disease and Healthy)
     classes = ["disease", "healthy"] 
 else:
-    # General definition for multi-class models
     classes = [f"class_{i}" for i in range(num_classes)]
 
 # ========================= IMAGE UPLOAD & PREDICTION ======================
@@ -179,7 +173,11 @@ def prepare(img):
 
 if uploaded_file:
     img = Image.open(uploaded_file)
-    st.image(img, caption="Ảnh đã tải lên", width=300)
+    
+    # Display image centered
+    col_img_1, col_img_2, col_img_3 = st.columns([1, 'auto', 1])
+    with col_img_2:
+        st.image(img, caption="Ảnh đã tải lên", width=300)
 
     if st.button("🔍 Dự đoán"):
         with st.spinner("Đang phân tích hình ảnh..."):
