@@ -1,5 +1,11 @@
+# Core packages
 streamlit==1.32.2
-tensorflow==2.20.0
-numpy==1.25.0
-Pillow==10.1.0
-requests==2.32.0
+tensorflow==2.12.0
+numpy
+pillow
+opencv-python
+matplotlib
+
+# Optional but recommended for deployment
+setuptools>=68.0.0
+wheel>=0.40.0
