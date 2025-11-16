@@ -5,6 +5,9 @@ from PIL import Image
 import os
 import requests
 import time
+# Sử dụng log level của TensorFlow để tránh cảnh báo
+import logging
+tf.get_logger().setLevel(logging.ERROR)
 
 # ========================= CONFIG UI ==========================
 st.set_page_config(
@@ -17,7 +20,7 @@ st.markdown("""
 <style>
 /* 1. Background and Typography */
 .stApp {
-    background-color: #f0fff0; /* Nền xanh lá cây nhạt theo yêu cầu */
+    background-color: #f0fff0; /* Nền xanh lá cây nhạt */
     color: #1a1a1a;
     padding-top: 2rem;
 }
@@ -111,9 +114,9 @@ if not st.session_state.logged_in:
 # Tiêu đề chính (đã fix lỗi xuống dòng)
 st.header("🌿 Plant Disease Detection System")
 
-# Centered Logo Display
+# Centered Logo Display (FIXED: Thay 'auto' bằng số nguyên 1 để tránh lỗi TypeError)
 logo_path = "assets/Logo_Marie_Curie.png" 
-col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 'auto', 1])
+col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 2, 1])
 with col_logo_2:
     if os.path.exists(logo_path):
         st.image(logo_path, width=180)
@@ -131,7 +134,6 @@ def load_model_from_drive():
     if not os.path.exists(MODEL_PATH):
         try:
             with st.spinner("Đang tải mô hình..."):
-                # Use a small wait time for visual feedback before starting download
                 time.sleep(1) 
                 r = requests.get(MODEL_URL, stream=True)
                 r.raise_for_status() 
@@ -142,7 +144,7 @@ def load_model_from_drive():
             st.error(f"Lỗi khi tải mô hình: {e}")
             st.stop()
             
-    # Load model (Fixed: Removed the problematic disable_resource_sanitization call)
+    # Load model (FIXED: Đã loại bỏ đoạn code gây lỗi AttributeError)
     with st.spinner("Đang load mô hình..."):
         model = tf.keras.models.load_model(MODEL_PATH)
     return model
@@ -175,7 +177,7 @@ if uploaded_file:
     img = Image.open(uploaded_file)
     
     # Display image centered
-    col_img_1, col_img_2, col_img_3 = st.columns([1, 'auto', 1])
+    col_img_1, col_img_2, col_img_3 = st.columns([1, 2, 1])
     with col_img_2:
         st.image(img, caption="Ảnh đã tải lên", width=300)
 
