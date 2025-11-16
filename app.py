@@ -161,8 +161,8 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ========================= TẢI MÔ HÌNH ==========================
-MODEL_PATH = "plant_disease_Cnn.h5"
-MODEL_URL = "https://drive.google.com/uc?export=download&id=1pLZYbUXHnoIEZEHrjg2Q-bj9Q47vOKh1"
+MODEL_PATH = "plant_disease_mobilenet.h5"
+MODEL_URL = "https://drive.google.com/uc?export=download&id=12P8C_vUiKc2p_TdHqrZgciXfUjCl2vrk"
 
 @st.cache_resource
 def load_model():
@@ -228,3 +228,4 @@ if uploaded:
 
 st.markdown("</div>", unsafe_allow_html=True)
 render_footer()
+
