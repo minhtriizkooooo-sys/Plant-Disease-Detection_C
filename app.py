@@ -15,13 +15,14 @@ st.set_page_config(
 )
 
 # ========================= CUSTOM CSS & STYLES ==========================
-# Áp dụng phong cách Tailwind/Modern theo yêu cầu
+# Áp dụng phong cách Tailwind/Modern và tinh chỉnh màu sắc xanh lá cây
 st.markdown("""
 <style>
-/* Định nghĩa biến màu dựa trên UI mẫu của bạn */
+/* Định nghĩa biến màu dựa trên UI mẫu */
 :root {
-    --primary-green: #2e7d32; /* Sắc xanh lá đậm */
-    --light-green-bg: #e8f5e9; /* Sắc xanh lá nhạt cho nền */
+    --primary-green: #2e7d32; /* Sắc xanh lá đậm, chuyên nghiệp */
+    --light-green-bg: #f0fff0; /* Nền xanh lá cây rất nhạt (Mint Cream) */
+    --accent-green: #4CAF50; /* Xanh lá cây nhấn */
 }
 
 /* 1. Global Background (Light Green) */
@@ -32,7 +33,7 @@ st.markdown("""
     padding-top: 0;
 }
 
-/* 2. Header Style: White background, shadow (Tái tạo Header HTML) */
+/* 2. Header Style: White background, shadow */
 .header-container {
     background-color: white;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
@@ -43,7 +44,7 @@ st.markdown("""
     z-index: 100;
 }
 .header-container img {
-    max-height: 80px; /* max-h-20 */
+    max-height: 80px; 
     width: auto;
     object-fit: contain;
 }
@@ -64,8 +65,8 @@ h1 { font-size: 2rem; }
     margin: 0 auto 3rem auto;
     padding: 30px;
     border-radius: 12px;
-    background-color: #ffffff; /* Nền card trắng */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+    background-color: #ffffff; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
 }
 
 /* 5. Input fields style */
@@ -93,11 +94,16 @@ div.stTextInput>div>div>input:focus, div.stFileUploader > label + div:focus {
     border: none;
 }
 .stButton>button:hover {
-    background-color: #1b5e20; /* Darker green on hover */
+    background-color: #1b5e20; 
     transform: translateY(-1px); 
 }
 
-/* 7. Footer Style */
+/* 7. Result Display Styling */
+.stSuccess { background-color: #e6ffe6; border-left: 5px solid var(--accent-green); padding: 10px; border-radius: 5px; }
+.stWarning { background-color: #fffbe6; border-left: 5px solid #ffc107; padding: 10px; border-radius: 5px; }
+.stMetric { border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; margin-top: 15px; background-color: #f9f9f9; }
+
+/* 8. Footer Style */
 .footer {
     text-align: center;
     padding: 1.5rem;
@@ -126,16 +132,14 @@ def render_header():
     logo_path = "assets/Logo_Marie_Curie.png"
     
     with col_c:
-        if os.path.exists(logo_path):
-            st.image(logo_path, width=180)
-        else:
-            st.markdown(f"""
-                <div style='text-align: center;'>
-                    <img src='https://placehold.co/180x80/2e7d32/ffffff?text=EMR+AI+LOGO' 
-                         alt='EMR AI LOGO' 
-                         class='max-h-20 w-auto object-contain'>
-                </div>
-            """, unsafe_allow_html=True)
+        # Sử dụng div để đảm bảo căn giữa
+        st.markdown(f"""
+            <div style='text-align: center;'>
+                <img src='{"static/Logo_Marie_Curie.png" if os.path.exists(logo_path) else "https://placehold.co/180x80/2e7d32/ffffff?text=EMR+AI+LOGO"}' 
+                     alt='EMR AI LOGO' 
+                     class='max-h-20 w-auto object-contain'>
+            </div>
+        """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ========================= FOOTER COMPONENT ==========================
@@ -158,18 +162,16 @@ if "logged_in" not in st.session_state:
 # ========================= LOGIN PAGE =============================
 
 if not st.session_state.logged_in:
-    # Render Header and Footer only on the login screen for consistency
     render_header()
     
-    # Main content card for login
     st.markdown("<div class='login-container'>", unsafe_allow_html=True)
     
     st.markdown(f"""
-        <h1 class="text-3xl font-bold text-primary-green text-center">
+        <h1 class="text-3xl font-bold text-primary-green text-center mb-6">
             Hệ thống Phát hiện Bệnh Cây bằng AI
         </h1>
         <p class="text-gray-600 text-center mb-4">
-            Sử dụng mô hình Convolutional Neural Network (CNN) để phân loại lá cây.
+            Ứng dụng nhận diện các loại bệnh trên lá cây.
         </p>
         <h2 class="text-2xl font-semibold text-primary-green border-b border-gray-200 pb-2">
             <i class="fas fa-sign-in-alt mr-2"></i> Đăng nhập hệ thống
@@ -239,22 +241,19 @@ st.markdown("""
     </p>
 """, unsafe_allow_html=True)
 
-# ========================= CLASS LABELS (SỬA LẠI THEO YÊU CẦU) =====================
+# ========================= CLASS LABELS (EXPLICIT 2-CLASS ASSIGNMENT) =====================
 num_classes = model.output_shape[-1]
 
-# CẢNH BÁO: Vì không thể trích xuất tên lớp từ file .h5, chúng ta dùng tên chung
-# và yêu cầu người dùng tự điền.
-classes = [f"Class_{i}" for i in range(num_classes)]
-st.markdown(
-    f"""
-    <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg mb-6 text-sm" role="alert">
-        <p><strong>⚠️ CẢNH BÁO QUAN TRỌNG:</strong></p>
-        <p>Mô hình của bạn có **{num_classes} lớp**. Hiện tại, tên lớp đang được đặt là {classes}.</p>
-        <p>Để kết quả hiển thị chính xác, bạn <strong>phải thay thế</strong> danh sách <code>classes</code> trong code 
-        theo đúng thứ tự Alphabetical mà mô hình đã được huấn luyện.</p>
-    </div>
-    """, unsafe_allow_html=True
-)
+if num_classes == 2:
+    # Gán tên lớp tường minh theo yêu cầu. 
+    # Thường Class 0 là Disease/Bệnh, Class 1 là Healthy/Khỏe mạnh
+    # Nếu mô hình của bạn train ngược lại, bạn cần đổi thứ tự này.
+    classes = ["BỆNH", "KHỎE MẠNH"] 
+else:
+    # Dùng tên chung nếu có nhiều hơn 2 lớp (nhưng vẫn cần người dùng tự thay)
+    classes = [f"Class_{i}" for i in range(num_classes)]
+    st.warning(f"⚠️ Mô hình có {num_classes} lớp. Vui lòng kiểm tra và thay thế danh sách classes trong code để tên bệnh hiển thị chính xác.")
+
 
 # ========================= IMAGE UPLOAD & PREDICTION ======================
 st.subheader("📸 Tải ảnh lá cây để nhận diện bệnh")
@@ -263,11 +262,11 @@ uploaded_file = st.file_uploader("Tải ảnh lên (.jpg, .png)", type=["jpg", "
 
 def prepare(img):
     """Tiền xử lý ảnh: thay đổi kích thước, chuẩn hóa, thêm chiều batch."""
-    img = img.resize((224, 224)) # Kích thước input của mô hình
-    img = np.asarray(img) / 255.0 # Chuẩn hóa
-    if len(img.shape) == 2:  # Xử lý ảnh xám (Grayscale)
+    img = img.resize((224, 224)) 
+    img = np.asarray(img) / 255.0 
+    if len(img.shape) == 2: 
         img = np.stack((img,) * 3, axis=-1)
-    return np.expand_dims(img, axis=0) # Thêm chiều batch
+    return np.expand_dims(img, axis=0) 
 
 if uploaded_file:
     img = Image.open(uploaded_file)
@@ -290,13 +289,16 @@ if uploaded_file:
                 confidence = float(np.max(pred))
                 
         # Display results
-        # Dùng ngưỡng 70% mặc định, nhưng vấn đề "overfitting" vẫn cần được giải quyết bằng việc retrain mô hình.
+        result_name = classes[class_id].upper()
+
         if confidence * 100 > 70:
             st.balloons()
-            st.success(f"✅ **Kết quả Dự đoán:** {classes[class_id].upper()}")
+            # Hiển thị kết quả rõ ràng (BỆNH hoặc KHỎE MẠNH)
+            st.markdown(f'<div class="stSuccess">🌿 **Kết quả Dự đoán:** <strong style="font-size: 1.25em;">{result_name}</strong></div>', unsafe_allow_html=True)
             st.metric(label="Độ tin cậy", value=f"{confidence * 100:.2f}%")
         else:
-            st.warning(f"⚠️ **Kết quả Không Rõ Ràng:** Mô hình dự đoán là '{classes[class_id]}' với độ tin cậy {confidence * 100:.2f}%. Vui lòng thử ảnh khác.")
+            # Hiển thị kết quả cảnh báo
+            st.markdown(f'<div class="stWarning">⚠️ **Kết quả Không Rõ Ràng:** Mô hình dự đoán là <strong>{result_name}</strong> với độ tin cậy {confidence * 100:.2f}%. Vui lòng thử ảnh khác.</div>', unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True) # End main-card
 
