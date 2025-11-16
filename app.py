@@ -135,9 +135,8 @@ def render_header():
         # Sử dụng div để đảm bảo căn giữa
         st.markdown(f"""
             <div style='text-align: center;'>
-                <img src='{"static/Logo_Marie_Curie.png" if os.path.exists(logo_path) else "https://placehold.co/180x80/2e7d32/ffffff?text=EMR+AI+LOGO"}' 
-                     alt='EMR AI LOGO' 
-                     class='max-h-20 w-auto object-contain'>
+                 <img src="static/Logo_Marie_Curie.png" alt="Logo Marie Curie"
+                    class='max-h-20 w-auto object-contain'>
             </div>
         """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -303,3 +302,4 @@ if uploaded_file:
 st.markdown("</div>", unsafe_allow_html=True) # End main-card
 
 render_footer()
+
