@@ -5,16 +5,13 @@ import os
 import numpy as np
 from PIL import Image
 
-# URL của mô hình
 MODEL_URL = "https://raw.githubusercontent.com/minhtriizkooooo-sys/Plant-Disease-Detection_C/main/model/plant_disease_mobilenet.h5"
 MODEL_PATH = "plant_disease_mobilenet.h5"
 
-# Đảm bảo chỉ tải mô hình một lần
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
         with st.spinner("Đang tải mô hình từ GitHub..."):
-            # Thử tải mô hình từ URL GitHub
             r = requests.get(MODEL_URL)
             if r.status_code == 200:
                 with open(MODEL_PATH, "wb") as f:
@@ -24,9 +21,15 @@ def load_model():
                 st.stop()
     with st.spinner("Đang load mô hình..."):
         # Load mô hình từ file đã tải xuống
-        return tf.keras.models.load_model(MODEL_PATH)
+        model = tf.keras.models.load_model(MODEL_PATH)
+        
+        # Thêm GlobalAveragePooling2D nếu mô hình chưa có
+        if not isinstance(model.layers[-2], tf.keras.layers.GlobalAveragePooling2D):
+            model.add(tf.keras.layers.GlobalAveragePooling2D())
+        
+        return model
 
-# Thử load mô hình
+# Load mô hình
 model = load_model()
 
 # ========================= CLASS LABELS ==========================
