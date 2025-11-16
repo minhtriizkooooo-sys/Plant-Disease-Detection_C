@@ -1,18 +1,13 @@
-# Core dependencies
-streamlit==1.32.2
-requests==2.32.4
+# Đảm bảo pip, setuptools, wheel mới nhất để cài prebuilt wheel
+pip>=25.3
+setuptools>=68.0.0
+wheel>=0.41.2
 
-# Pillow phiên bản ổn định trên Python 3.11
-pillow==9.5.0
+# Pillow chọn phiên bản đã có wheel cho Python 3.11
+pillow==10.3.0
 
-# TensorFlow mới nhất tương thích Python 3.11
-tensorflow==2.20.0
-
-# Thêm các package khác nếu cần
-numpy==1.26.1
+# Các package khác của bạn (ví dụ)
+flask==2.3.2
+requests==2.31.0
+numpy==1.27.0
 pandas==2.1.1
-scikit-learn==1.3.1
-opencv-python==4.8.1.78
-
-# Optional: for image handling / ML utilities
-matplotlib==3.8.1
