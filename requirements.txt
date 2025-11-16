@@ -3,16 +3,19 @@ pip>=25.3
 setuptools>=68.0.0
 wheel>=0.41.2
 
-# Pillow prebuilt wheel cho Python 3.11
+# Pillow (chỉ hỗ trợ đến Python 3.12)
 Pillow>=10.5.1,<11
 
-# Ví dụ các package phổ biến, tùy chỉnh theo project
+# Web & Data
 Flask>=2.3.2
 requests>=2.31.0
 numpy>=1.27.0
 pandas>=2.1.1
 
-# Nếu cần thêm database hoặc deploy
+# Database & Deploy
 psycopg2-binary>=2.9.9
 gunicorn>=21.2.0
 python-dotenv>=1.0.0
+
+# BẮT BUỘC: Streamlit (vì bạn dùng `streamlit run app.py`)
+streamlit>=1.38.0
