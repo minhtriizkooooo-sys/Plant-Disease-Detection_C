@@ -6,6 +6,9 @@ import os
 import requests
 import time
 import logging
+import base64 
+from io import BytesIO 
+
 tf.get_logger().setLevel(logging.ERROR)
 
 # ========================= CONFIG UI ==========================
@@ -15,17 +18,18 @@ st.set_page_config(
 )
 
 # ========================= CUSTOM CSS & STYLES ==========================
-# Áp dụng phong cách Tailwind/Modern và tinh chỉnh màu sắc xanh lá cây
+# Áp dụng mã màu yêu cầu: --primary-green: #2e7d32 và --light-green-bg: #e8f5e9
 st.markdown("""
 <style>
-/* Định nghĩa biến màu dựa trên UI mẫu */
+/* Định nghĩa biến màu dựa trên yêu cầu của bạn */
 :root {
-    --primary-green: #2e7d32; /* Sắc xanh lá đậm, chuyên nghiệp */
-    --light-green-bg: #f0fff0; /* Nền xanh lá cây rất nhạt (Mint Cream) */
+    --primary-green: #2e7d32; /* Xanh lá đậm */
+    --light-green-bg: #e8f5e9; /* Nền xanh lá nhạt, đẹp hơn */
     --accent-green: #4CAF50; /* Xanh lá cây nhấn */
+    --dark-green-hover: #1b5e20; /* Màu khi hover nút */
 }
 
-/* 1. Global Background (Light Green) */
+/* 1. Global Background */
 .stApp {
     background-color: var(--light-green-bg); 
     font-family: 'Inter', sans-serif;
@@ -94,7 +98,7 @@ div.stTextInput>div>div>input:focus, div.stFileUploader > label + div:focus {
     border: none;
 }
 .stButton>button:hover {
-    background-color: #1b5e20; 
+    background-color: var(--dark-green-hover); 
     transform: translateY(-1px); 
 }
 
@@ -126,19 +130,49 @@ PASS = "Test@123456"
 # ========================= HEADER COMPONENT ==========================
 
 def render_header():
-    """Hiển thị Header và Logo theo thiết kế mới."""
+    """Hiển thị Header và Logo, sử dụng Base64 để nhúng ảnh (không dùng placeholder)."""
     st.markdown('<div class="header-container">', unsafe_allow_html=True)
     col_l, col_c, col_r = st.columns([1, 2, 1])
     logo_path = "assets/Logo_Marie_Curie.png"
     
-    with col_c:
-        # Sử dụng div để đảm bảo căn giữa
-        st.markdown(f"""
-            <div style='text-align: center;'>
-                 <img src="static/Logo_Marie_Curie.png" alt="Logo Marie Curie"
-                    class='max-h-20 w-auto object-contain'>
+    logo_html = ""
+
+    if os.path.exists(logo_path):
+        try:
+            img = Image.open(logo_path)
+            # Convert image to Base64
+            buffered = BytesIO()
+            img.save(buffered, format="PNG") 
+            img_str = base64.b64encode(buffered.getvalue()).decode()
+            logo_src = f"data:image/png;base64,{img_str}"
+            logo_alt = "Logo Marie Curie"
+            
+            logo_html = f"""
+                <div style='text-align: center;'>
+                    <img src='{logo_src}' 
+                         alt='{logo_alt}' 
+                         class='max-h-20 w-auto object-contain'>
+                </div>
+            """
+        except Exception as e:
+            # Nếu xảy ra lỗi khi tải file, in lỗi ra console và hiển thị chữ thay thế
+            logging.error(f"Lỗi khi load logo từ path {logo_path}: {e}")
+            logo_html = f"""
+                <div style='text-align: center; color: var(--primary-green); font-size: 1.5rem; font-weight: bold;'>
+                    Logo Marie Curie (Tải ảnh lỗi)
+                </div>
+            """
+    else:
+        # Nếu không tìm thấy file, hiển thị chữ thay thế
+        logo_html = f"""
+            <div style='text-align: center; color: var(--primary-green); font-size: 1.5rem; font-weight: bold;'>
+                Logo Marie Curie (File không tồn tại)
             </div>
-        """, unsafe_allow_html=True)
+        """
+            
+    with col_c:
+        st.markdown(logo_html, unsafe_allow_html=True)
+        
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ========================= FOOTER COMPONENT ==========================
@@ -149,7 +183,7 @@ def render_footer():
     <div class="footer">
         <p><strong>Liên hệ:</strong> Công ty TNHH MTV Minh Trí và những người bạn Marie Curie<br>
         159 Nam Kỳ Khởi Nghĩa, Phường Xuân Hòa, Tp. Hồ Chí Minh<br>
-        Lại Nguyễn Minh Trí - <a href="mailto:laingminhtri@gmail.com">laingminhtri@gmail.com</a></p>
+        Lại Nguyễn Minh Trí - <a href="mailto:laingminhtri@gmail.com" style="color: var(--primary-green);">laingminhtri@gmail.com</a></p>
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
@@ -245,11 +279,9 @@ num_classes = model.output_shape[-1]
 
 if num_classes == 2:
     # Gán tên lớp tường minh theo yêu cầu. 
-    # Thường Class 0 là Disease/Bệnh, Class 1 là Healthy/Khỏe mạnh
-    # Nếu mô hình của bạn train ngược lại, bạn cần đổi thứ tự này.
     classes = ["BỆNH", "KHỎE MẠNH"] 
 else:
-    # Dùng tên chung nếu có nhiều hơn 2 lớp (nhưng vẫn cần người dùng tự thay)
+    # Dùng tên chung nếu có nhiều hơn 2 lớp 
     classes = [f"Class_{i}" for i in range(num_classes)]
     st.warning(f"⚠️ Mô hình có {num_classes} lớp. Vui lòng kiểm tra và thay thế danh sách classes trong code để tên bệnh hiển thị chính xác.")
 
@@ -302,4 +334,3 @@ if uploaded_file:
 st.markdown("</div>", unsafe_allow_html=True) # End main-card
 
 render_footer()
-
