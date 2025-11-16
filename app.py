@@ -2,9 +2,6 @@ import requests
 import tensorflow as tf
 import streamlit as st
 import os
-from tensorflow.keras.applications import MobileNetV2
-from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout
-from tensorflow.keras.models import Sequential
 import numpy as np
 from PIL import Image
 
@@ -44,7 +41,6 @@ def prepare(img):
     return np.expand_dims(x, axis=0)  # Mở rộng kích thước ảnh để phù hợp với mô hình
 
 # ========================= MAIN UI ==========================
-render_header()
 st.markdown("<div class='main-card'>", unsafe_allow_html=True)
 st.markdown("<h1>Phát hiện Bệnh Cây</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;color:#555;'>Tải lên ảnh lá cây để nhận diện bệnh</p>", unsafe_allow_html=True)
@@ -62,9 +58,11 @@ if uploaded:
     if st.button("Dự đoán", use_container_width=True):
         with st.spinner("Đang phân tích..."):
             x = prepare(img)
-            pred = model.predict(x)[0]  # Dự đoán lớp cho ảnh
+
+            # Dự đoán lớp cho ảnh
+            pred = model.predict(x)[0]  # Dự đoán lớp
             conf = float(np.max(pred))  # Lấy độ tin cậy cao nhất
-            label = classes[np.argmax(pred)]  # Chọn lớp có độ tin cậy cao nhất
+            label = classes[np.argmax(pred)]  # Lựa chọn lớp có độ tin cậy cao nhất
 
         if conf > 0.7:
             st.balloons()
@@ -77,4 +75,3 @@ if uploaded:
             )
 
 st.markdown("</div>", unsafe_allow_html=True)
-render_footer()
