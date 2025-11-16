@@ -4,7 +4,9 @@ setuptools>=68.0.0
 wheel>=0.41.2
 
 # Pillow (chỉ hỗ trợ đến Python 3.12)
-Pillow>=10.5.1,<11
+
+Pillow==10.4.0
+
 
 # Web & Data
 Flask>=2.3.2
@@ -19,3 +21,4 @@ python-dotenv>=1.0.0
 
 # BẮT BUỘC: Streamlit (vì bạn dùng `streamlit run app.py`)
 streamlit>=1.38.0
+
