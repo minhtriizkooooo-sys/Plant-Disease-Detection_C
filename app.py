@@ -160,7 +160,7 @@ if not st.session_state.logged_in:
 MODEL_PATH = "plant_disease_mobilenet.h5"
 
 # 👉👉 Hãy thay URL này bằng link RAW GitHub thật của bạn
-MODEL_URL = "https://raw.githubusercontent.com/<username>/<repo>/main/model/plant_disease_mobilenet.h5"
+MODEL_URL = "https://raw.githubusercontent.com/minhtriizkooooo-sys/Plant-Disease-Detection_C/main/model/plant_disease_mobilenet.h5"
 
 @st.cache_resource
 def load_model():
@@ -226,3 +226,4 @@ if uploaded:
 
 st.markdown("</div>", unsafe_allow_html=True)
 render_footer()
+
