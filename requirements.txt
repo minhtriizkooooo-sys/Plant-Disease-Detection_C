@@ -1,24 +1,58 @@
-# Core build tools
-pip>=25.3
-setuptools>=68.0.0
-wheel>=0.41.2
+# Các thư viện đã được cài đặt thành công (từ log trước)
+Flask
+Pillow
+altair
+attrs
+blinker
+cachetools
+certifi
+charset_normalizer
+click
+gitdb
+gitpython
+gunicorn
+idna
+itsdangerous
+jinja2
+jsonschema
+jsonschema-specifications
+markupsafe
+narwhals
+numpy
+packaging
+pandas
+pyarrow
+pydeck
+python-dateutil
+python-dotenv
+pytz
+referencing
+requests
+rpds-py
+setuptools
+six
+smmap
+streamlit
+tenacity
+toml
+tornado
+typing-extensions
+tzdata
+urllib3
+watchdog
+werkzeug
+wheel
 
-# Pillow (chỉ hỗ trợ đến Python 3.12)
+# Các thư viện quan trọng bị thiếu (ModuleNotFoundError)
+tensorflow
+keras
 
-Pillow==10.4.0
+# Thư viện cho Database (từ log trước)
+psycopg2-binary
+protobuf
 
-
-# Web & Data
-Flask>=2.3.2
-requests>=2.31.0
-numpy>=1.27.0
-pandas>=2.1.1
-
-# Database & Deploy
-psycopg2-binary>=2.9.9
-gunicorn>=21.2.0
-python-dotenv>=1.0.0
-
-# BẮT BUỘC: Streamlit (vì bạn dùng `streamlit run app.py`)
-streamlit>=1.38.0
-
+# Nếu bạn dùng Gunicorn để chạy Streamlit, bạn cần thêm một lệnh chạy khác 
+# (Ví dụ: `CMD streamlit run app.py`).
+# Tuy nhiên, nếu bạn chạy Flask/WSGI, cấu hình hiện tại có thể ổn. 
+# Nếu bạn chạy một ứng dụng Streamlit, hãy xem lại phần cấu hình lệnh chạy (Start Command) 
+# trên Render, không phải chỉ riêng requirements.txt.
