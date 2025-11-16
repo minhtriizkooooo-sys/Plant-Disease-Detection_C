@@ -1,13 +1,18 @@
-# Đảm bảo pip, setuptools, wheel mới nhất để cài prebuilt wheel
+# Core build tools
 pip>=25.3
 setuptools>=68.0.0
 wheel>=0.41.2
 
-# Pillow chọn phiên bản đã có wheel cho Python 3.11
-pillow==10.3.0
+# Pillow prebuilt wheel cho Python 3.11
+Pillow>=10.5.1,<11
 
-# Các package khác của bạn (ví dụ)
-flask==2.3.2
-requests==2.31.0
-numpy==1.27.0
-pandas==2.1.1
+# Ví dụ các package phổ biến, tùy chỉnh theo project
+Flask>=2.3.2
+requests>=2.31.0
+numpy>=1.27.0
+pandas>=2.1.1
+
+# Nếu cần thêm database hoặc deploy
+psycopg2-binary>=2.9.9
+gunicorn>=21.2.0
+python-dotenv>=1.0.0
